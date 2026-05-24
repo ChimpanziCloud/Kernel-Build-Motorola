@@ -1,1 +1,47 @@
+name: Build Kernel
+on:
+  workflow_dispatch:
+    inputs:
+      KERNEL_TYPE:
+        description: 'Kernel Type'
+        required: true
+        default: 'Official'
+        type: choice
+        options:
+        - Official
+        - KernelSU-Next + SUSFS
+      KERNEL_SOURCE:
+        description: 'Motorola Kernel Source'
+        required: true
+        default: 'https://github.com/MotorolaMobilityLLC/kernel-mtk.git'
+      KERNEL_BRANCH:
+        description: 'Kernel Branch'
+        required: true
+        default: 'MMI-U4UI34.8-22-7'
+        type: choice
+        options:
+        - MMI-U4UI34.8-22-7
+        - MMI-V1UI35H.11-39-16
+        - MMI-V1UIS35H.11-39-16-2
+        - MMI-V1UIS35H.11-39-16-5
+        - MMI-V1UIS35H.11-39-28-5
 
+jobs:
+  build:
+    name: Build Kernel by ${{ github.actor }}
+    runs-on: ubuntu-24.04
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+              
+    - name: Update and Install Packages
+      run: |
+        sudo apt update && sudo apt install git-core gnupg flex bison build-essential zip curl zlib1g-dev libc6-dev-i386 x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig repo
+
+    - name: Sync Kernel Source
+      run: |
+         git clone ${{ inputs.KERNEL_SOURCE}} -b ${{ inputs.KERNEL_BRANCH}} kernel_sync
