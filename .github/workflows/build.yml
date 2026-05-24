@@ -56,7 +56,7 @@ jobs:
       if: ${{ inputs.KERNEL_TYPE == 'KernelSU-Next + SUSFS' }}
       run: |
          cd ~
-         git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android14-6.1
+         git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android14-6.1 ~/susfs4ksu
          cp ~/susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ~/kernel_sync/KernelSU-Next/
          cp ~/susfs4ksu/kernel_patches/50_add_susfs_in_kernel-gki-android14-6.1.patch ~/kernel_sync/
          cp ~/susfs4ksu/kernel_patches/fs/* ~/kernel_sync/fs
@@ -67,4 +67,10 @@ jobs:
     - name: Build Kernel
       run: |
          cd ~/kernel_sync
-         tools/bazel build // common:kernel_aarch64
+         tools/bazel build --config=fast --lto=thin //common:kernel_aarch64_dist
+
+    - name: Upload Kernel
+      uses: actions/upload-artifact@v7
+      with:
+          name: Out-Directory
+          path: ~/kernel_sync/bazel-bin/common/kernel_aarch64/ # or path/to/artifact
