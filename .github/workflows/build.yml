@@ -47,13 +47,13 @@ jobs:
          git config --global user.name "John Doe"
          git config --global user.email "johndoe@gmail.com"
          mkdir -p ~/manifest-source && cd ~/manifest-source
-         repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b ${{ inputs.MANIFEST_BRANCH}}
+         repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android14-6.1-2024-03
          repo --trace sync -c -j$(nproc --all) --no-tags --fail-fast
 
     - name: Sync Kernel Source
       run: |
          rm ~/manifest-source/common
-         git clone ${{ inputs.KERNEL_SOURCE}} -b common-android14-6.1-2024-03 ~/manifest-source/common
+         git clone ${{ inputs.KERNEL_SOURCE}} -b ${{ inputs.KERNEL_BRANCH}} ~/manifest-source/common
 
     - name: Add KernelSU-Next
       if: ${{ inputs.KERNEL_TYPE == 'KernelSU-Next + SUSFS' }}
