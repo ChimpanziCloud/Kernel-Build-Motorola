@@ -62,7 +62,26 @@ jobs:
          cp ~/susfs4ksu/kernel_patches/fs/* ~/kernel_sync/fs
          cp ~/susfs4ksu/kernel_patches/include/linux/* ~/kernel_sync/include/linux
          cd ~/kernel_sync/KernelSU-Next && patch -p1 < 10_enable_susfs_for_ksu.patch
-         cd ~/kernel_sync/KernelSU-Next && patch -p1 < 50_add_susfs_in_kernel.patch
+         cd ~/kernel_sync/KernelSU-Next && patch -p1 < 50_add_susfs_in_kernel-gki-android14-6.1.patch
+
+    - name: Configure KernelSU and SUSFS Flags
+      if: ${{ inputs.KERNEL_TYPE == 'KernelSU-Next + SUSFS' }}
+      run: |
+         cd ~/kernel_sync
+         # Append flags to the GKI defconfig
+         cat <<EOF >> arch/arm64/configs/gki_defconfig
+         CONFIG_KSU=y
+         CONFIG_KSU_SUSFS=y
+         CONFIG_KSU_SUSFS_SUS_PATH=y
+         CONFIG_KSU_SUSFS_SUS_MOUNT=y
+         CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y
+         CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y
+         CONFIG_KSU_SUSFS_SPOOF_UNAME=y
+         CONFIG_KSU_SUSFS_ENABLE_LOG=y
+         EOF
+         
+         # Remove ABI protected exports to prevent Wi-Fi breakage on Android 14
+         rm -f android/abi_gki_protected_exports_*
          
     - name: Build Kernel
       run: |
@@ -73,4 +92,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
           name: Out-Directory
-          path: ~/kernel_sync/bazel-bin/common/kernel_aarch64/ # or path/to/artifact
+          path: ~/kernel_sync/out/kernel_aarch64/* # or path/to/artifact
