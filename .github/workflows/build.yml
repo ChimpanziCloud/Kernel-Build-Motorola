@@ -48,7 +48,7 @@ jobs:
          git config --global user.email "johndoe@gmail.com"
          mkdir -p ~/manifest-source && cd ~/manifest-source
          repo init -u https://android.googlesource.com/kernel/manifest -b common-android14-6.1-2024-03
-         repo --trace sync -c -j$(nproc --all) --fail-fast
+         repo --trace sync -c -j$(nproc --all) --fail-fast -g default,-platform:kernel/common
 
     - name: Sync Kernel Source
       run: |
