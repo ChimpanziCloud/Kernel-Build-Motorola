@@ -106,7 +106,7 @@ jobs:
       run: |
          cd ~/manifest-source
          tools/bazel build --config=fast --lto=thin //common:kernel_aarch64
-         ls -a ~/manifest-source/bazel-bin/common/
+         ls -a ~/manifest-source/bazel-bin/common/kernel_aarch64/
 
     - name: Upload Kernel
       uses: actions/upload-artifact@v4
